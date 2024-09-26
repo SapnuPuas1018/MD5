@@ -51,6 +51,7 @@ def main():
             start = start_range + i*core
             end = start_range + i*(core + 1)
             core_thread = threading.Thread(target=decrypt, args=(start, end, sock))
+            core_thread.start()
             thread_list.append(core_thread)
             print(thread_list)
 

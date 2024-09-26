@@ -15,7 +15,8 @@ def handle_client(client_socket, client_address):
     number_of_cores = recv(client_socket)
     print(f'number_of_cores: {number_of_cores}')
     give_range()
-    recv(client_socket)
+    if recv(client_socket) == 'found':
+        print('found it')
 
 
 def main():
@@ -35,7 +36,6 @@ def main():
             thread_list.append(thread)
             print(thread_list)
 
-        print('done')
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 
