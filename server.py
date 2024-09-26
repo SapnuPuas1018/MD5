@@ -19,6 +19,11 @@ def handle_client(client_socket, client_address):
         print('found it')
 
 
+def wait_for_input_to_start():
+    input('enter an input pls: ')
+    clients_join = False
+
+
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -26,8 +31,11 @@ def main():
         server_socket.listen(QUEUE_LEN)
         print("Listening for connections on port %d" % PORT)
 
+        threading.Thread(target=wait_for_input_to_start).start()
+
+        clients_join = True
         thread_list = []
-        while len(thread_list) != 1:
+        while clients_join:
             client_socket, client_address = server_socket.accept()
             print('New connection received from ' + client_address[0] + ':' + str(client_address[1]))
 
@@ -35,7 +43,6 @@ def main():
             thread.start()
             thread_list.append(thread)
             print(thread_list)
-
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 

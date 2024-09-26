@@ -6,7 +6,7 @@ from protocol import *
 
 SERVER_PORT = 12345
 MAX_PACKET = 1024
-
+ENCRYPTED_MSG = 'EC9C0F7EDCC18A98B1F31853B1813301'
 
 def md5(str_to_hash):
     result = hashlib.md5(str_to_hash.encode())
@@ -19,14 +19,15 @@ def md5(str_to_hash):
 def decrypt(start, stop, sock):
     for i in range(start, stop):
         hash = md5(str(i).zfill(10))
-        if hash == 'EC9C0F7EDCC18A98B1F31853B1813301':
+        if hash == ENCRYPTED_MSG:
             print('found')
             send(sock, 'found')
 
 
 
-def wait_for_start():   # waiting for a command from the server to start
-    pass
+def wait_to_start(sock):   # waiting for a command from the server to start
+    data = recv(sock)
+    print('data: ' + data)
 
 
 def main():
@@ -35,11 +36,12 @@ def main():
         sock.connect(('127.0.0.1', SERVER_PORT))
         print('connected')
 
-        wait_for_start()
+        wait_to_start(sock)
 
         num_cores = os.cpu_count()
         send(sock, str(num_cores))
-        #
+
+
         # # receive range
         # num_range = recv(sock) #   start-stop
         # start, stop = num_range.split('-')
