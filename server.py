@@ -8,10 +8,14 @@ PORT = 12345
 QUEUE_LEN = 20
 MAX_PACKET = 1024
 
+def give_range():
+    pass
 
 def handle_client(client_socket, client_address):
     number_of_cores = recv(client_socket)
     print(f'number_of_cores: {number_of_cores}')
+    give_range()
+    recv(client_socket)
 
 
 def main():
@@ -28,8 +32,10 @@ def main():
 
             thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
             thread.start()
-            thread_list.append(1)
+            thread_list.append(thread)
+            print(thread_list)
 
+        print('done')
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 
