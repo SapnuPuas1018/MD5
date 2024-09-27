@@ -1,7 +1,7 @@
 import logging
 import socket
 import threading
-from client import get_range
+from client import get_range, FOUND
 from protocol import *
 
 IP = '127.0.0.1'
@@ -12,23 +12,27 @@ START_RANGE = 0
 STOP_RANGE = 10**10
 LAST = 0
 lock = threading.Lock()
+FOUND = False
 
 def give_range(client_socket):
     lock.acquire()
     global LAST
     send(client_socket, f'{LAST}-{LAST + 10 ** 6}')
+    print(f'i sent range: {LAST}-{LAST + 10 ** 6}')
     LAST = LAST + 10 ** 6
     lock.release()
 
 def handle_client(client_socket, client_address):
+    global FOUND
     number_of_cores = recv(client_socket)
     print(f'number_of_cores: {number_of_cores}')
-    give_range(client_socket)
-    data = recv(client_socket)
-    if data == 'found':
-        print('found it')
-    elif data == 'gimme more':
-
+    while True:
+        give_range(client_socket)
+        data = recv(client_socket)
+        if data == 'found':
+            print('found it')
+            FOUND = True
+            break
 
 
 def wait_for_input_to_start():
@@ -47,7 +51,7 @@ def main():
 
         clients_join = True
         thread_list = []
-        while True:
+        while not FOUND:
             client_socket, client_address = server_socket.accept()
             print('New connection received from ' + client_address[0] + ':' + str(client_address[1]))
 
@@ -55,6 +59,7 @@ def main():
             thread.start()
             thread_list.append(thread)
             print(thread_list)
+            print(f'FOUND : {FOUND}' )
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 
