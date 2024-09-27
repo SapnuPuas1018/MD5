@@ -1,7 +1,6 @@
 import logging
 import socket
 import threading
-from client import get_range, FOUND
 from protocol import *
 
 IP = '127.0.0.1'
@@ -31,13 +30,10 @@ def handle_client(client_socket, client_address):
         data = recv(client_socket)
         if data == 'found':
             print('found it')
+            original = recv(client_socket)
+            print('original message is: ' + original)
             FOUND = True
             break
-
-
-def wait_for_input_to_start():
-    input('enter an input pls: ')
-    clients_join = False
 
 
 def main():
@@ -47,9 +43,7 @@ def main():
         server_socket.listen(QUEUE_LEN)
         print("Listening for connections on port %d" % PORT)
 
-        # threading.Thread(target=wait_for_input_to_start).start()
 
-        clients_join = True
         thread_list = []
         while not FOUND:
             client_socket, client_address = server_socket.accept()
@@ -59,7 +53,7 @@ def main():
             thread.start()
             thread_list.append(thread)
             print(thread_list)
-            print(f'FOUND : {FOUND}' )
+            print(f'FOUND: {FOUND}')
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 

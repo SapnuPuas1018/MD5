@@ -6,7 +6,7 @@ from protocol import *
 
 SERVER_PORT = 12345
 MAX_PACKET = 1024
-ENCRYPTED_MSG = '25eb4ad31170d3d19abc7fc617aeb776'
+ENCRYPTED_MSG = '457694e29379be80d5dd65d3c519f15b'
 FOUND = False
 
 def md5(str_to_hash):
@@ -26,6 +26,8 @@ def decrypt(start, stop, sock):
             FOUND = True
             print(f'found it : {original} ')
             send(sock, 'found')
+            send(sock, str(original))
+
 
 
 def get_range(sock):   # waiting for a command from the server to start
@@ -49,10 +51,12 @@ def main():
         num_cores = os.cpu_count()
         send(sock, str(num_cores))
 
-        start_range, stop_range = get_range(sock)
-        i = int((stop_range - start_range)/num_cores)
+
         thread_list = []
         while not FOUND:
+            start_range, stop_range = get_range(sock)
+            i = int((stop_range - start_range) / num_cores)
+            print(f'FOUND : {FOUND}' )
             for core in range(num_cores):
                 start = start_range + i*core
                 end = start_range + i*(core + 1)
@@ -64,8 +68,6 @@ def main():
                 thread.join()
                 send(sock, 'not found')
                 print('i sent: not found')
-            start_range, stop_range = get_range(sock)
-            i = int((stop_range - start_range) / num_cores)
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 
