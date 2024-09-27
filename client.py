@@ -4,31 +4,31 @@ import threading
 import hashlib
 from protocol import *
 
+
 SERVER_PORT = 12345
 MAX_PACKET = 1024
-ENCRYPTED_MSG = '457694e29379be80d5dd65d3c519f15b'
-FOUND = False
+ENCRYPTED_MSG = 'EC9C0F7EDCC18A98B1F31853B1813301' # 457694e29379be80d5dd65d3c519f15b
+
+found = False
 
 
 def md5(str_to_hash):
     result = hashlib.md5(str_to_hash.encode())
-
     # print('The hexadecimal equivalent of hash is: ', end='')
     # print(result.hexdigest())
     return result.hexdigest()
 
 
 def decrypt(start, stop, sock):
-    global FOUND
+    global found
     for i in range(start, stop):
         original = str(i).zfill(10)
         hash = md5(original)
         if hash == ENCRYPTED_MSG:
-            FOUND = True
+            found = True
             print(f'found it : {original} ')
             send(sock, 'found')
             send(sock, str(original))
-
 
 
 def get_range(sock):   # waiting for a command from the server to start
@@ -47,15 +47,13 @@ def main():
         sock.connect(('127.0.0.1', SERVER_PORT))
         print('connected')
 
-
         # cpu cores
         num_cores = os.cpu_count()
         send(sock, str(num_cores))
 
-        global FOUND
-        thread_list = []
-        while not FOUND:
 
+        thread_list = []
+        while not found:
             start_range, stop_range = get_range(sock)
             i = int((stop_range - start_range) / num_cores)
             for core in range(num_cores):
@@ -71,7 +69,7 @@ def main():
                 send(sock, 'not found')
                 print('i sent: not found')
 
-            print(f'FOUND : {FOUND}')
+            print(f'found : {found}')
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 

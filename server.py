@@ -11,7 +11,7 @@ START_RANGE = 0
 STOP_RANGE = 10**10
 LAST = 0
 lock = threading.Lock()
-FOUND = False
+found = False
 
 def give_range(client_socket):
     lock.acquire()
@@ -22,7 +22,7 @@ def give_range(client_socket):
     lock.release()
 
 def handle_client(client_socket, client_address):
-    global FOUND
+    global found
     number_of_cores = recv(client_socket)
     print(f'number_of_cores: {number_of_cores}')
     while True:
@@ -32,9 +32,8 @@ def handle_client(client_socket, client_address):
             print('found it')
             original = recv(client_socket)
             print('the original message is: ' + original)
-            FOUND = True
+            found = True
             break
-
 
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -43,8 +42,11 @@ def main():
         server_socket.listen(QUEUE_LEN)
         print("Listening for connections on port %d" % PORT)
 
+
+        global found
+
         thread_list = []
-        while not FOUND:
+        while not found:
             client_socket, client_address = server_socket.accept()
             print('New connection received from ' + client_address[0] + ':' + str(client_address[1]))
 
@@ -52,7 +54,7 @@ def main():
             thread.start()
             thread_list.append(thread)
             print(thread_list)
-            print(f'FOUND: {FOUND}')
+            print(f'found: {found}')
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 
