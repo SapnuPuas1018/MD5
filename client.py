@@ -25,10 +25,11 @@ def decrypt(start, stop, sock):
 
 
 
-def wait_to_start(sock):   # waiting for a command from the server to start
-    data = recv(sock)
-    print('data: ' + data)
-
+def get_range(sock):   # waiting for a command from the server to start
+    range = recv(sock)
+    print('range: ' + range)
+    start, stop = range.split('-')
+    return start, stop
 
 def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,17 +37,16 @@ def main():
         sock.connect(('127.0.0.1', SERVER_PORT))
         print('connected')
 
-        wait_to_start(sock)
 
+        # cpu cores
         num_cores = os.cpu_count()
         send(sock, str(num_cores))
 
+        start_range, stop_range = get_range(sock)
 
         # # receive range
         # num_range = recv(sock) #   start-stop
         # start, stop = num_range.split('-')
-        start_range = 0
-        stop_range = 1000000000
         i = int((stop_range - start_range)/num_cores)
         thread_list = []
         for core in range(num_cores):
