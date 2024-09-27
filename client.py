@@ -9,6 +9,7 @@ MAX_PACKET = 1024
 ENCRYPTED_MSG = '457694e29379be80d5dd65d3c519f15b'
 FOUND = False
 
+
 def md5(str_to_hash):
     result = hashlib.md5(str_to_hash.encode())
 
@@ -51,12 +52,12 @@ def main():
         num_cores = os.cpu_count()
         send(sock, str(num_cores))
 
-
+        global FOUND
         thread_list = []
         while not FOUND:
+
             start_range, stop_range = get_range(sock)
             i = int((stop_range - start_range) / num_cores)
-            print(f'FOUND : {FOUND}' )
             for core in range(num_cores):
                 start = start_range + i*core
                 end = start_range + i*(core + 1)
@@ -64,10 +65,13 @@ def main():
                 core_thread.start()
                 thread_list.append(core_thread)
                 print(thread_list)
+
             for thread in thread_list:
                 thread.join()
                 send(sock, 'not found')
                 print('i sent: not found')
+
+            print(f'FOUND : {FOUND}')
     except socket.error as err:
         print('received socket error on client socket' + str(err))
 

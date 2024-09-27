@@ -31,7 +31,7 @@ def handle_client(client_socket, client_address):
         if data == 'found':
             print('found it')
             original = recv(client_socket)
-            print('original message is: ' + original)
+            print('the original message is: ' + original)
             FOUND = True
             break
 
@@ -42,7 +42,6 @@ def main():
         server_socket.bind((IP, PORT))
         server_socket.listen(QUEUE_LEN)
         print("Listening for connections on port %d" % PORT)
-
 
         thread_list = []
         while not FOUND:
