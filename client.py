@@ -6,7 +6,7 @@ from protocol import *
 
 
 SERVER_PORT = 12345
-ENCRYPTED_MSG = '457694e29379be80d5dd65d3c519f15b' # 457694e29379be80d5dd65d3c519f15b     EC9C0F7EDCC18A98B1F31853B1813301
+ENCRYPTED_MSG = 'ec9c0f7edcc18a98b1f31853b1813301' # 457694e29379be80d5dd65d3c519f15b     ec9c0f7edcc18a98b1f31853b1813301
 
 found = False
 
@@ -31,7 +31,6 @@ def decrypt(start, stop, sock):
 
 
 def get_range(sock):   # waiting for a command from the server to start
-    print('NIGGA')
     range = recv(sock)
     print('range: ' + range)
     start, stop = range.split('-')
@@ -61,12 +60,11 @@ def main():
                 core_thread = threading.Thread(target=decrypt, args=(start, end, sock))
                 core_thread.start()
                 thread_list.append(core_thread)
-                print(thread_list)
+                # print(thread_list)
 
             for thread in thread_list:
                 thread.join()
                 send(sock, 'not found')
-                print('i sent: not found')
 
             print(f'found : {found}')
     except socket.error as err:

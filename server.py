@@ -13,6 +13,8 @@ QUEUE_SIZE = 1
 IP = '0.0.0.0'
 PORT = 12345
 SOCKET_TIMEOUT = 2
+
+WORK_PER_CORE = 10**7
 lock = threading.Lock()
 
 
@@ -71,7 +73,7 @@ class Server:
 
     def give_range(self, client_socket):
         lock.acquire()
-        send(client_socket, f'{self.last}-{self.last + 10 ** 6}')
-        print(f'i sent range: {self.last}-{self.last + 10 ** 6}')
-        self.last += 10 ** 6
+        send(client_socket, f'{self.last}-{self.last + WORK_PER_CORE}')
+        # print(f'i sent range: {self.last}-{self.last + WORK_PER_CORE}')
+        self.last += WORK_PER_CORE
         lock.release()
