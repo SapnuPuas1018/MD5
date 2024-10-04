@@ -17,6 +17,8 @@ SOCKET_TIMEOUT = 2
 WORK_PER_CORE = 10**7
 lock = threading.Lock()
 
+ENCRYPTED_MSG = 'ec9c0f7edcc18a98b1f31853b1813301' # 457694e29379be80d5dd65d3c519f15b     ec9c0f7edcc18a98b1f31853b1813301     e807f1fcf82d132f9bb018ca6738a19f
+
 
 class Server:
     def __init__(self):  # Use double underscores for the constructor
@@ -25,6 +27,7 @@ class Server:
         self.found = False
         self.decrypted_str = ''
         self.last = 0
+
 
     def start_server(self):
         try:
@@ -46,30 +49,43 @@ class Server:
                     print(self.found)
                 except socket.timeout:
                     pass
+
         except socket.error as err:
-            print('received socket exception - ' + str(err))
+            print('socket exception - ' + str(err))
+
         finally:
             # Thread joining
             for thread in self.thread_list:
                 thread.join()
-
             self.server_socket.close()
+
             return self.decrypted_str
 
-    def handle_client(self, client_socket, addr):
-        # Receive Work Request
-        number_of_cores = recv(client_socket)
-        print(f'number_of_cores: {number_of_cores}')
-        while True:
-            self.give_range(client_socket)
-            data = recv(client_socket)
-            if data == 'found':
-                print('found it')
-                self.decrypted_str = recv(client_socket)
-                print('the original message is: ' + self.decrypted_str)
 
-                self.found = True
-                break
+    def handle_client(self, client_socket, addr):
+        try:
+            send(client_socket, ENCRYPTED_MSG)
+            # Receive Work Request
+            number_of_cores = recv(client_socket)
+            print(f'number_of_cores: {number_of_cores}')
+            while not self.found:
+                self.give_range(client_socket)
+                data = recv(client_socket)
+                if data == 'found':
+                    print('found it')
+                    self.decrypted_str = recv(client_socket)
+                    print('the original message is: ' + self.decrypted_str)
+
+                    self.found = True
+        except (ConnectionResetError, BrokenPipeError) as err:
+            print('Client disconnected unexpectedly - ' + err)
+        finally:
+            # Decrement active clients once this client is done
+            try:
+                client_socket.close()
+            except Exception as err:
+                print(f'Error closing client socket: {err}')
+
 
     def give_range(self, client_socket):
         lock.acquire()
