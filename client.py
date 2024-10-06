@@ -96,6 +96,7 @@ if __name__ == '__main__':
     start, stop = client.get_range()
     assert start == 0 and stop == 100, "get_range function did not return expected values!"
 
+
     print("All assertions passed!")
 
     # Start the client (you may want to mock socket connections for proper testing)

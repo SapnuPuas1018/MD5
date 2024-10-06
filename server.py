@@ -115,6 +115,7 @@ if __name__ == '__main__':
     expected_hash = hashlib.md5(test_string.encode()).hexdigest()
     assert hashlib.md5(test_string.encode()).hexdigest() == expected_hash, "MD5 hash test failed!"
 
+
     print("All assertions passed!")
 
     # Start the server (might require actual client interaction or additional mocking)
