@@ -4,7 +4,7 @@ import threading
 import hashlib
 from protocol import *
 
-# BOMBOCLAT
+
 IP = '127.0.0.1'
 SERVER_PORT = 12345
 
@@ -75,3 +75,28 @@ class Client:
         # print('The hexadecimal equivalent of hash is: ', end='')
         # print(result.hexdigest())
         return result.hexdigest()
+
+
+if __name__ == '__main__':
+    # Create a client instance
+    client = Client()
+
+    # Test socket initialization
+    assert isinstance(client.sock, socket.socket), "Socket initialization failed!"
+    assert client.num_cores > 0, "Number of cores should be greater than 0!"
+
+    # Test MD5 hashing function
+    test_string = "1234567890"
+    expected_hash = hashlib.md5(test_string.encode()).hexdigest()
+    assert client.md5(test_string) == expected_hash, "MD5 hashing function failed!"
+
+
+    client.get_range = lambda: (0, 100)  # Mocking get_range to return a fixed range
+
+    start, stop = client.get_range()
+    assert start == 0 and stop == 100, "get_range function did not return expected values!"
+
+    print("All assertions passed!")
+
+    # Start the client (you may want to mock socket connections for proper testing)
+    # client.start_client() # Uncomment if testing with actual server

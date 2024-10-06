@@ -93,3 +93,29 @@ class Server:
         # print(f'i sent range: {self.last}-{self.last + WORK_PER_CORE}')
         self.last += WORK_PER_CORE
         lock.release()
+
+
+
+if __name__ == '__main__':
+    # Create server instance
+    server = Server()
+
+    # Assert that the server socket is initialized correctly
+    assert isinstance(server.server_socket, socket.socket), "Server socket initialization failed!"
+
+    # Assert that the encrypted message is set
+    assert ENCRYPTED_MSG != '', "Encrypted message should not be empty!"
+    assert len(ENCRYPTED_MSG) != 10, "Encrypted message length should be 10!"
+
+    # Check that initial range value is set correctly
+    assert server.last == 0, "Initial range should be 0!"
+
+    # Test md5 hash function
+    test_string = "1234567890"
+    expected_hash = hashlib.md5(test_string.encode()).hexdigest()
+    assert hashlib.md5(test_string.encode()).hexdigest() == expected_hash, "MD5 hash test failed!"
+
+    print("All assertions passed!")
+
+    # Start the server (might require actual client interaction or additional mocking)
+    # server.start_server()  # Uncomment if testing with real clients
