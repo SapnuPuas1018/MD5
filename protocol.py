@@ -1,9 +1,23 @@
+"""
+author - Yuval Hayun
+date   - 06/10/24
+"""
+
 import socket
 
-
 def send(connected_socket, msg):
-    msg = msg.strip()
+    """
+    Sends a message to the connected socket. The message is formatted to include its length
+    as a prefix followed by an exclamation mark (`!`), and spaces in the message are normalized.
 
+    :param connected_socket: The socket through which the message is sent
+    :type connected_socket: socket.socket
+    :param msg: The message to send
+    :type msg: str
+    :return: None
+    :rtype: None
+    """
+    msg = msg.strip()
     msg = str(len(msg)) + '!' + ' '.join(msg.split())
 
     # Encode the modified 'msg' string and send it through the 'connected_socket'
@@ -11,17 +25,25 @@ def send(connected_socket, msg):
 
 
 def recv(connected_socket):
+    """
+    Receives a message from the connected socket. It first reads the length prefix, then receives
+    the actual message until the expected length is met.
+
+    :param connected_socket: The socket from which the message is received
+    :type connected_socket: socket.socket
+    :return: The received message
+    :rtype: str
+    """
     length = ''
     while '!' not in length:
-        length += connected_socket.recv(1).decode()
-    length = length[:-1]
+        length += connected_socket.recv(1).decode()  # Read until '!' is found
+    length = length[:-1]  # Remove '!' from length
 
-    length = int(length)
+    length = int(length)  # Convert length to integer
 
     # Receive the message until the expected length is reached
     received_msg = ''
     while len(received_msg) < length:
-        received_msg += connected_socket.recv(length-len(received_msg)).decode()
+        received_msg += connected_socket.recv(length - len(received_msg)).decode()
 
-    # Split the received message using '!!' as the separator
     return received_msg
